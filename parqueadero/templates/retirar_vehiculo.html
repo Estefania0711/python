@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retirar Vehículos</title>
+
+    <style>
+        body {
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        tr:hover {
+            background: #e8f4f8;
+        }
+
+        .btn-retiro {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-retiro:hover {
+            background-color: #c9302c;
+        }
+
+        a {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: #114263;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        a:hover {
+            background: #0d2d47;
+        }
+
+        .sin-vehiculos {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-confirmar {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-confirmar:hover {
+            background-color: #c9302c;
+        }
+
+        .btn-cancelar {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-cancelar:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'inicio' %}">Volver al inicio</a>
+
+    <h2>Retirar Vehículos</h2>
+
+    {% if vehiculos %}
+    <table>
+        <thead>
+            <tr>
+                <th>N° Puesto</th>
+                <th>Placa</th>
+                <th>Tipo</th>
+                <th>Propietario</th>
+                <th>Teléfono</th>
+                <th>Fecha Entrada</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in vehiculos %}
+            <tr>
+                <td><strong>{{ v.numero_puesto }}</strong></td>
+                <td>{{ v.placa }}</td>
+                <td>{{ v.tipo }}</td>
+                <td>{{ v.propietario }}</td>
+                <td>{{ v.telefono }}</td>
+                <td>{{ v.fecha_entrada|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <button class="btn-retiro" onclick="confirmarRetiro('{{ v.id_estacionamiento }}')">Retirar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="sin-vehiculos">
+        <p>No hay vehículos estacionados en este momento.</p>
+    </div>
+    {% endif %}
+
+    <div id="modalConfirm" class="modal">
+        <div class="modal-content">
+            <h3>Confirmar Retiro</h3>
+            <p>¿Está seguro de que desea retirar este vehículo?</p>
+            <div class="modal-buttons">
+                <button class="btn-confirmar" onclick="ejecutarRetiro()">Sí, Retirar</button>
+                <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let idEstacionamientoActual = null;
+
+        function confirmarRetiro(id) {
+            idEstacionamientoActual = id;
+            document.getElementById('modalConfirm').style.display = 'block';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalConfirm').style.display = 'none';
+            idEstacionamientoActual = null;
+        }
+
+        function ejecutarRetiro() {
+            if (idEstacionamientoActual) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{% url "procesar_retiro" %}';
+                
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'id_estacionamiento';
+                input.value = idEstacionamientoActual;
+                
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = '{{ csrf_token }}';
+                
+                form.appendChild(csrfInput);
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalConfirm');
+            if (event.target == modal) {
+                cerrarModal();
+            }
+        }
+    </script>
+</body>
+</html>

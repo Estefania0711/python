@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresa tu vehiculo</title>
+</head>
+
+<body>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 350px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+        }
+
+        label {
+            margin-top: 10px;
+        }
+
+        select,
+        button {
+            margin-top: 5px;
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <div class="container">
+        <h2>Ingresa tu vehiculo</h2>
+        <form method="POST" action="{% url 'ingresar_vehiculo' %}">
+            {% csrf_token %}
+            <label for="usuario">Selecciona el Usuario:</label>
+            <select id="usuario" name="id_usuario" required>
+                <option value="">-- Selecciona un usuario --</option>
+                {% for usuario in usuarios %}
+                <option value="{{ usuario.id }}">{{ usuario.nombre }} - {{ usuario.telefono }}</option>
+                {% endfor %}
+            </select>
+            <label for="vehiculo">Placa del Vehículo:</label>
+            <select id="vehiculo" name="id_vehiculo" required>
+                <option value="">-- Primero selecciona un usuario --</option>
+            </select>
+            <label for="puesto">Selecciona el Puesto:</label>
+            <select id="puesto" name="id_puesto" required>
+                {% for puesto in puestos %}
+                <option value="{{ puesto.id }}">{{ puesto.numero_puesto }} - {{ puesto.estado }}</option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+            <button type="submit">Guardar Vehículo</button>
+            <a href="{% url 'inicio' %}">Cancelar</a>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('usuario').addEventListener('change', function() {
+            const usuarioId = this.value;
+            const vehiculoSelect = document.getElementById('vehiculo');
+            
+            vehiculoSelect.innerHTML = '<option value="">Cargando...</option>';
+            
+            if (!usuarioId) {
+                vehiculoSelect.innerHTML = '<option value="">-- Primero selecciona un usuario --</option>';
+                return;
+            }
+            
+            fetch(`/obtener-vehiculos/?id_usuario=${usuarioId}`)
+                .then(response => response.json())
+                .then(data => {
+                    vehiculoSelect.innerHTML = '';
+                    
+                    if (data.vehiculos && data.vehiculos.length > 0) {
+                        data.vehiculos.forEach(vehiculo => {
+                            const option = document.createElement('option');
+                            option.value = vehiculo.id;
+                            option.textContent = `${vehiculo.placa} - ${vehiculo.tipo}`;
+                            vehiculoSelect.appendChild(option);
+                        });
+                    } else {
+                        vehiculoSelect.innerHTML = '<option value="">Este usuario no tiene vehículos</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    vehiculoSelect.innerHTML = '<option value="">Error al cargar vehículos</option>';
+                });
+        });
+    </script>
+</body>
+
+</html>

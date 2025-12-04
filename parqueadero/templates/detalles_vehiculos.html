@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Vehículo</title>
+
+    <style>
+        body {
+            background: #cfcbcb;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .estado-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .estado-activo {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .estado-retirado {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .detalle-section {
+            margin-bottom: 25px;
+        }
+
+        .detalle-section h2 {
+            font-size: 18px;
+            color: #2c3e50;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .detalle-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .detalle-row:last-child {
+            border-bottom: none;
+        }
+
+        .detalle-label {
+            font-weight: bold;
+            color: #34495e;
+            min-width: 150px;
+        }
+
+        .detalle-valor {
+            color: #7f8c8d;
+            text-align: right;
+            flex: 1;
+        }
+
+        .detalle-valor.pendiente {
+            color: #e74c3c;
+            font-style: italic;
+        }
+
+        .detalle-valor.completado {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        a, button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-volver {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .btn-volver:hover {
+            background-color: #5568d3;
+        }
+
+        .btn-imprimir {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-imprimir:hover {
+            background-color: #229954;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Detalles del Estacionamiento</h1>
+
+        <div class="estado-badge {% if detalles.estado == 'Activo' %}estado-activo{% else %}estado-retirado{% endif %}">
+            Estado: {{ detalles.estado }}
+        </div>
+
+        <div class="detalle-section">
+            <h2>Información del Vehículo</h2>
+            <div class="detalle-row">
+                <span class="detalle-label">Placa:</span>
+                <span class="detalle-valor completado">{{ detalles.placa }}</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Tipo:</span>
+                <span class="detalle-valor completado">{{ detalles.tipo_vehiculo }}</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">N° Puesto:</span>
+                <span class="detalle-valor completado">{{ detalles.numero_puesto }}</span>
+            </div>
+        </div>
+
+        <div class="detalle-section">
+            <h2>Información del Propietario</h2>
+            <div class="detalle-row">
+                <span class="detalle-label">Nombre:</span>
+                <span class="detalle-valor completado">{{ detalles.propietario }}</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Teléfono:</span>
+                <span class="detalle-valor completado">{{ detalles.telefono }}</span>
+            </div>
+        </div>
+
+        <div class="detalle-section">
+            <h2>Información del Estacionamiento</h2>
+            <div class="detalle-row">
+                <span class="detalle-label">Fecha Entrada:</span>
+                <span class="detalle-valor completado">{{ detalles.fecha_entrada|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Fecha Salida:</span>
+                <span class="detalle-valor {% if detalles.fecha_salida != 'Pendiente' %}completado{% else %}pendiente{% endif %}">
+                    {% if detalles.fecha_salida != 'Pendiente' %}
+                        {{ detalles.fecha_salida|date:"d/m/Y H:i" }}
+                    {% else %}
+                        {{ detalles.fecha_salida }}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="detalle-section">
+            <h2> Información de Cobro</h2>
+            <div class="detalle-row">
+                <span class="detalle-label">Horas Total:</span>
+                <span class="detalle-valor {% if detalles.horas_total != 'Pendiente' %}completado{% else %}pendiente{% endif %}">
+                    {% if detalles.horas_total != 'Pendiente' %}
+                        {{ detalles.horas_total }} horas
+                    {% else %}
+                        {{ detalles.horas_total }}
+                    {% endif %}
+                </span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Monto Total:</span>
+                <span class="detalle-valor {% if detalles.monto_total != 'Pendiente' %}completado{% else %}pendiente{% endif %}">
+                    {% if detalles.monto_total != 'Pendiente' %}
+                        ${{ detalles.monto_total }}
+                    {% else %}
+                        {{ detalles.monto_total }}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <a href="{% url 'gestionar_vehiculos' %}" class="btn-volver">Volver</a>
+        </div>
+    </div>
+</body>
+</html>

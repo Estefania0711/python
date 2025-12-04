@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puestos Disponibles</title>
+
+    <style>
+        body {
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+        a {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: #114263;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'inicio' %}">Volver al inicio</a>
+
+<h2>Puestos Disponibles</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>N° Puesto</th>
+            <th>Estado</th>
+            <th>Placa Vehículo</th>
+            <th>Propietario</th>
+            <th>Teléfono</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in puestos %}
+        <tr {% if p.ocupado %}style="background-color: #fff3cd;"{% endif %}>
+            <td><strong>{{ p.numero_puesto }}</strong></td>
+            <td>
+                {% if p.ocupado %}
+                    <span style="color: #d9534f; font-weight: bold;">Ocupado</span>
+                {% else %}
+                    <span style="color: #5cb85c; font-weight: bold;">Disponible</span>
+                {% endif %}
+            </td>
+            <td>{{ p.placa }}</td>
+            <td>{{ p.propietario }}</td>
+            <td>{{ p.telefono }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align:center;">No hay puestos disponibles.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

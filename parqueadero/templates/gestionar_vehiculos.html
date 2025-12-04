@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Vehículos</title>
+
+    <style>
+        body {
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        tr:hover {
+            background: #e8f4f8;
+        }
+
+        .btn-detalles {
+            background-color: #0275d8;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-detalles:hover {
+            background-color: #0257b1;
+        }
+
+        .btn-detalles:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        a {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: #114263;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        a:hover {
+            background: #0d2d47;
+        }
+
+        .sin-vehiculos {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+
+        .estado-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .estado-activo {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .estado-sin-registros {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'inicio' %}">Volver al inicio</a>
+
+        <h2>Gestionar Vehículos</h2>
+
+        {% if vehiculos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Tipo</th>
+                    <th>Propietario</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in vehiculos %}
+                <tr>
+                    <td><strong>{{ v.placa }}</strong></td>
+                    <td>{{ v.tipo }}</td>
+                    <td>{{ v.propietario }}</td>
+                    <td>{{ v.telefono }}</td>
+                    <td>
+                        <span class="estado-badge {% if v.estado_estacionamiento == 'Activo' %}estado-activo{% else %}estado-sin-registros{% endif %}">
+                            {{ v.estado_estacionamiento }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if v.id_estacionamiento %}
+                            <a href="{% url 'detalles_vehiculo' v.id_estacionamiento %}" class="btn-detalles">Ver Detalles</a>
+                        {% else %}
+                            <button class="btn-detalles" disabled>Sin Registros</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="sin-vehiculos">
+            <p>No hay vehículos registrados en el sistema.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
